@@ -1,0 +1,27 @@
+Package: ClustDISPROF
+Type: Package
+Title: Dissimilarity Profile Analysis and Clustering
+Version: 0.5.1
+Authors@R: c(person(given = c("David", "L."), family = "Jones",
+                    role = c("aut"),
+                    comment = "Creator of 'FATHOM TOOLBOX FOR MATLAB'")
+           , person(given = c("Joshua", "P."), family = "Kilborn",  
+                    role = "ctb")
+           , person(given = c("Michael", "J."), family = "Schram", 
+                    role = c("cre","trl"), 
+                    email = "mschram@usf.edu",
+                    comment = "Translated MATLAB code to R")
+		    )
+Maintainer: Joshua P. Kilborn <jpk@usf.edu> and Michael J. Schram <mschram@usf.edu>
+Description: Functions for performing Dissimilarity Profile Analysis and Clustering
+License: This package was adapted from the 'FATHOM TOOLBOX FOR MATLAB' which was released under the GNU General Public License, version 2.
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.2.2
+Imports: 
+    colorspace,
+    dendextend,
+    ggplot2,
+    magrittr,
+    pracma,
+    vegan
