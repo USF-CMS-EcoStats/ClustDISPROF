@@ -160,7 +160,7 @@ if (plt == TRUE) {
 
   DisProf_plt <- ggplot()+
     theme_classic()+
-    theme(legend.position = c(0.90, 0.15))+
+    theme(legend.position = c(0.80, 0.15))+
     labs(title    = "DISPROF: Dissimilarity Profile Analysis",
          subtitle = "(99% confidence envelope)",
          x        = "Sort Order",

@@ -49,6 +49,7 @@
 #' @return Returns a list structure that contains the following:
 #' \itemize{
 #'  \item \code{grp}: vector specifying group membership for each row of Y
+#'  \item \code{clusters}: explicit group membership
 #'  \item \code{inc}: record of incremental change made to GRP
 #'  \item \code{p}: corresponding randomized p-values
 #'  \item \code{p_idx}: corresponding rows of Y used in the assessment
@@ -57,10 +58,10 @@
 #'  \item \code{Z}: cluster analysis tree linkages
 #'  \item \code{cols}: vector indicating splits that were associated with
 #'  significant p-values (=1) and those that were note (=0)
-#'  \item \code{method}: method used for constructing cluster analysis tree
+#'  \item \code{linkType}: method used for constructing cluster analysis tree
 #'  \item \code{bin}: symmetric binary connectivity matrix defining pair-wise
-#'  relationships as objects that are members of the same cluster (=0) or
-#'  members of different clusters (=1)'
+#'  relationships as objects that are members of the same cluster (=FALSE) or
+#'  members of different clusters (=TRUE)'
 #' }
 #'
 #'
@@ -236,7 +237,7 @@ for (i in 1:(nC-1)) {
         cat(paste0("Pi = ", format(round(Pi[cnt],3), nsmall = 4), ", ",
             "p = ", format(round(p[cnt],3), nsmall = 4), sep = ""))
 
-        # If not significant structure exists, no further splitting of group
+        # If no significant structure exists, no further splitting of group
         if ((p[cnt] - alpha)>tol) {
           # Mark rows as terminal group with a negative number
           grp[idxG] <- grp[idxG] * -1
@@ -249,25 +250,7 @@ for (i in 1:(nC-1)) {
   }
 }
 
-if (mc > 0) {
-  cat("\n--------------------------------------------------------",
-      "\n No. of groups identified      = ", cntG,
-      "\n No. of permutation iterations = ", iter,
-      "\n alpha level                   = ", alpha,
-      "\n dissimilarity metric          = ", dis,
-      "\n p-values adjusted for multiple testing: YES",
-      "\n--------------------------------------------------------\n")
-} else {
-  cat("\n--------------------------------------------------------",
-      "\n No. of groups identified      = ", cntG,
-      "\n No. of permutation iterations = ", iter,
-      "\n alpha level                   = ", alpha,
-      "\n dissimilarity metric          = ", dis,
-      "\n p-values adjusted for multiple testing: NO",
-      "\n--------------------------------------------------------\n")
-}
-
-# format for output (remove flag indicating terminal groups)
+# Format for output (remove flag indicating terminal groups)
 grp <- abs(grp)
 inc <- abs(inc)
 
@@ -294,6 +277,24 @@ for (i in 1:length(unique(grp))) {
   clusters[[i]] <- txt[grp == i]
 }
 
+bin <- (vegan::vegdist(grp, 'euc') != 0)
+
+# Print summary table to console
+  cat("\n--------------------------------------------------------",
+      "\n No. of groups identified      = ", cntG,
+      "\n No. of permutation iterations = ", iter,
+      "\n alpha level                   = ", alpha,
+      "\n dissimilarity metric          = ", dis,
+      "\n p-values adjusted for multiple testing:", ifelse(mc == TRUE,
+                                                            "YES",
+                                                            "NO"),
+      "\n--------------------------------------------------------",
+      "\nGroup membership:\n ")
+  cat(paste0("Group ", 1:max(grp), ": ",
+             sapply(clusters, paste, collapse = ' '),
+             "\n"),
+      "--------------------------------------------------------\n")
+
 # Wrap results into output structure
 result          <- list() # Pre-allocate the list
 
@@ -311,17 +312,7 @@ if (mc > 0) {
 result$Z        <- Z #list of cluster linkages needed to draw dendrograms
 result$colS     <- colS
 result$linkType <- linkType
+result$bin      <- bin
 
-    ### MS COMMENTS (2022-01-25): Need to reconcile this output - in Dr. Jones
-    ### version, when 2 outputs are defined (i.e., [result,bin]), then it
-    ### performs an additional step). Maybe just force this as part of the
-    ### output structure and call it a day?
-
-      # Optionally return binary connectivity matrix
-      #   0 = objects in same cluster
-      #   1 = objects in different clusters
-      # if(nargout > 1){
-      # bin <- ~(f_dis(grp, 'euc') ==0)
-      #}
-  return(result)
+return(result)
 }

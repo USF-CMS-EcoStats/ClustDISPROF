@@ -1,7 +1,7 @@
 Package: ClustDISPROF
 Type: Package
 Title: Dissimilarity Profile Analysis and Clustering
-Version: 0.5.1
+Version: 0.6.0
 Authors@R: c(person(given = c("David", "L."), family = "Jones",
                     role = c("aut"),
                     comment = "Creator of 'FATHOM TOOLBOX FOR MATLAB'")
