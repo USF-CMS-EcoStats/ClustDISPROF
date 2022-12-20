@@ -59,6 +59,7 @@ f_disprof_clust(
 Returns a list structure that contains the following:
 \itemize{
  \item \code{grp}: vector specifying group membership for each row of Y
+ \item \code{clusters}: explicit group membership
  \item \code{inc}: record of incremental change made to GRP
  \item \code{p}: corresponding randomized p-values
  \item \code{p_idx}: corresponding rows of Y used in the assessment
@@ -67,10 +68,10 @@ Returns a list structure that contains the following:
  \item \code{Z}: cluster analysis tree linkages
  \item \code{cols}: vector indicating splits that were associated with
  significant p-values (=1) and those that were note (=0)
- \item \code{method}: method used for constructing cluster analysis tree
+ \item \code{linkType}: method used for constructing cluster analysis tree
  \item \code{bin}: symmetric binary connectivity matrix defining pair-wise
- relationships as objects that are members of the same cluster (=0) or
- members of different clusters (=1)'
+ relationships as objects that are members of the same cluster (=FALSE) or
+ members of different clusters (=TRUE)'
 }
 }
 \description{
