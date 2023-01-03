@@ -2,10 +2,7 @@
 % Please edit documentation in R/f_recode.R
 \name{f_recode}
 \alias{f_recode}
-\title{Recode elements of vector as consecutive integers \cr
-\cr
-This function is used to convert treatment levels (e.g., "[2 2 2 5 5 5]") to
-"[1 1 1 2 2 2]" so proper ANOVA design matrices can be constructed.}
+\title{Recode elements}
 \usage{
 f_recode(Y)
 }
@@ -16,7 +13,7 @@ f_recode(Y)
 vector or matrix recoded as consecutive integers
 }
 \description{
-Recode elements of vector as consecutive integers \cr
+Recode elements of vector as consecutive integers. \cr
 \cr
 This function is used to convert treatment levels (e.g., "[2 2 2 5 5 5]") to
 "[1 1 1 2 2 2]" so proper ANOVA design matrices can be constructed.

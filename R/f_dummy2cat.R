@@ -1,6 +1,6 @@
-#' Convert dummy codes to a single categorical variable \cr
-#' \cr
-#' The purpose of this code is to essentially undo the effects of f_dummy
+#' Dummy code to categorical variable
+#'
+#' Convert dummy codes to a single categorical variable.
 #'
 #' @param X binary dummy codes created by f_dummy
 #' @return column vector of integers specifying factor levels or group

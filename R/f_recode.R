@@ -1,4 +1,6 @@
-#' Recode elements of vector as consecutive integers \cr
+#' Recode elements
+#'
+#' Recode elements of vector as consecutive integers. \cr
 #' \cr
 #' This function is used to convert treatment levels (e.g., "[2 2 2 5 5 5]") to
 #' "[1 1 1 2 2 2]" so proper ANOVA design matrices can be constructed.

@@ -2,9 +2,7 @@
 % Please edit documentation in R/f_dummy2cat.R
 \name{f_dummy2cat}
 \alias{f_dummy2cat}
-\title{Convert dummy codes to a single categorical variable \cr
-\cr
-The purpose of this code is to essentially undo the effects of f_dummy}
+\title{Dummy code to categorical variable}
 \usage{
 f_dummy2cat(X)
 }
@@ -16,7 +14,5 @@ column vector of integers specifying factor levels or group
   membership
 }
 \description{
-Convert dummy codes to a single categorical variable \cr
-\cr
-The purpose of this code is to essentially undo the effects of f_dummy
+Convert dummy codes to a single categorical variable.
 }
