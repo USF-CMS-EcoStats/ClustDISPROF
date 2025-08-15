@@ -2,11 +2,12 @@
 % Please edit documentation in R/f_disprof_clust.R
 \name{f_disprof_clust}
 \alias{f_disprof_clust}
-\title{Dissimilarity profile analysis (DISPROF) of a cluster analysis dendrogram}
+\title{Dissimilarity profile analysis (DISPROF) of a cluster analysis dendrogram based on samples or variables/species}
 \usage{
 f_disprof_clust(
   Y,
   dis = "euc",
+  type = "sample",
   txt = NULL,
   link = 1,
   mc = FALSE,
@@ -75,9 +76,10 @@ Returns a list structure that contains the following:
 }
 }
 \description{
-This function follows Clarke et al.'s (2008) description of similarity
-profile analysis (SIMPROF), but employs an equivalent approach based on
-dissimilarity profile analysis (DISPROF).\cr
+This function clusters samples or variables/species. It then uses dissimilarity profile analysis (DISPROF)
+to identify statistically significant clusters in either samples (type 1)
+or variables/species (type 3). Before using this function, f_disprof should be used to check
+for if there is any significant multivariate structure in the data.\cr
 \cr
 This method is a form of agglomerative, hierarchical' cluster analysis.
 }
@@ -86,6 +88,11 @@ Clarke, K. R., P. J. Somerfield, and R. N. Gorley. 2008.  Testing
   null hypotheses in exploratory community analyses: similarity profiles and
   biota-environmental linkage. J. Exp. Mar. Biol. Ecol. 366:56-69.
   (\href{https://doi.org/10.1016/j.jembe.2008.07.009}{Clarke et al., 2008})
+
+Somerfield, P. J., and K. R. Clarke. 2013.  Inverse analysis in
+non-parametric multivariate analyses: distinguishing groups of associated
+species which covary coherently across samples. J. Exp. Mar. Biol. Ecol. 449:261-273.
+  (\href{http://dx.doi.org/10.1016/j.jembe.2013.10.002}{Somerfield and Clarke, 2013})
 
 Legendre, P. & L. Legendre. 2012. Numerical ecology. 3rd English
   ed. Elsevier Science BV, Amsterdam.
