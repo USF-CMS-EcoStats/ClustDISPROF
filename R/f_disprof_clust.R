@@ -36,6 +36,8 @@
 #'  \item Cao                 (\code{'cao'})
 #' }
 #'
+#' @param type 'sample' will do type 1 DISPROF (testing structure in samples)
+#' and 'variable' will do type 3 DISPROF (local test of structure in variables/species)
 #' @param txt  Vector of row labels; generic labels are automatically generated if not provided
 #' @param link Type of cluster analysis the be performed:
 #' \enumerate{
@@ -105,6 +107,10 @@ if        (link == 1) {
   warning("'link' must be a value from 1 to 6'")
 }
 
+if(!(type %in% c('sample', 'variable'))){
+  stop("Unsupported value suppled for argument `type`")
+} #Add check early on
+
 # ensure Y is in appropriate format for distance measures
 Y <- as.matrix(Y)
 
@@ -113,7 +119,7 @@ Y <- as.matrix(Y)
 if (is.null(txt) == TRUE) {
   if(type == 'sample'){
     txt <- as.character(1:(dim(Y)[1]))
-  } else if (type == 'variable'){
+  } else {
     txt <- colnames(Y)
     }
 }
@@ -140,7 +146,7 @@ if(type == 'variable'){
 # Get number of leaves/terminal nodes in dendrogram
 if(type== 'sample'){
   nLeaves = dim(Y)[1]
-} else if(type== 'variable'){
+} else {
   nLeaves = dim(Y)[2]
 }
 
@@ -156,7 +162,7 @@ if(type== 'sample'){
 
 if(type == 'sample'){
   Y_dis <- vegan::vegdist(Y, dis, na.rm = TRUE) # distance between samples
-} else if(type =='variable'){
+} else {
   Y_dis <- vegan::vegdist(t(Y), dis, na.rm = TRUE) # distance between variables (often species)
 }
 

@@ -40,7 +40,8 @@
 #'  \item Binomial            (\code{'binomial'})
 #'  \item Cao                 (\code{'cao'})
 #' }
-#' @param type 'sample' will do type 1 DISPROF (testing structure in samples) and 'variable' will do type 3 DISPROF (testing structure in variables/species)
+#' @param type 'sample' will do type 1 DISPROF (testing structure in samples)
+#' and 'variable' will do type 2 DISPROF (global test of structure in variables/species)
 #' @param iter Number of permutation for DISPROF analysis
 #' @param verb Display results in the console window
 #' @param plt Optionally create a DISPROF plot
@@ -67,6 +68,11 @@ f_disprof <- function(Y,
                       plt   = FALSE,
                       verb2 = TRUE){
 
+
+if(!(type %in% c('sample', 'variable', '3'))){
+  stop("Unsupported value suppled for argument `type`")
+} #Add check early on
+
 ### Set no. of iterations for permuted dissimilarity profile
 if (iter < 1000) {
   iterM <- 1000 # need at least 1000
@@ -82,11 +88,9 @@ Y <- as.matrix(Y)
 
 if(type=='sample'){
   Y_dis <- vegan::vegdist(Y, dis, na.rm = TRUE) # distance between samples
-} else if(type=='variable' | type=='3'){
+} else{
   Y_dis <- vegan::vegdist(t(Y), dis, na.rm = TRUE) # distance between variables (often species)
 }
-
-
 
 D <- sort(as.vector(Y_dis))
 
@@ -102,6 +106,7 @@ for (i in 1:(iterM-1)) {
     # Type 1 DISPROF: distance between samples
     # H0: Samples are homogeneous, there is no multivariate structure
     # Permute within columns
+    # Distance among samples
     # Global and local test for multivariate structure in samples
     temp_D <- suppressWarnings(vegan::vegdist(apply(Y, 2, sample),
                                               dis,
@@ -115,7 +120,7 @@ for (i in 1:(iterM-1)) {
     temp_D <- suppressWarnings(vegan::vegdist(t(apply(Y, 2, sample)),
                                               dis,
                                               na.rm = TRUE)) # distance between variables (often species)
-  } else if(type=='3'){
+  } else {
     # Secret Option used internally in f_disprof cluster for determining which species/variable clusters are significant (Not a global test for structure)
     # Type 3 DISPROF
     # H0: Species are coherently associated
@@ -169,7 +174,7 @@ if (iter > 0) {
       temp_D <- suppressWarnings(vegan::vegdist(t(apply(Y, 2, sample)),
                                                 dis,
                                                 na.rm = TRUE)) # distance between variables (often species)
-    } else if(type=='3'){
+    } else {
       # Type 3 DISPROF
       # H0: Species are coherently associated
       # Permute within rows
@@ -223,13 +228,13 @@ if (plt == TRUE) {
   } else if(type == 'variable'){
     plt_title<- paste("Type 2", plt_title)
   } else{
-    plt_title<- paste("Type 3", plt_title) # Wouldn't really use this
+    plt_title<- paste("Type 3", plt_title) # Wouldn't really use this as not a global test
   }
 
   DisProf_plt <- ggplot()+
     theme_classic()+
     theme(legend.position = c(0.80, 0.15))+
-    labs(title    = paste(ifelse(type=='sample', "Type 1", "Type 2"), "DISPROF: Dissimilarity Profile Analysis"),
+    labs(title    = plt_title,
          subtitle = "(99% confidence envelope)",
          x        = "Sort Order",
          y        = "Dissimilarity")+

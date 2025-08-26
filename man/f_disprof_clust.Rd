@@ -36,6 +36,9 @@ f_disprof_clust(
  \item Cao                 (\code{'cao'})
 }}
 
+\item{type}{'sample' will do type 1 DISPROF (testing structure in samples)
+and 'variable' will do type 3 DISPROF (local test of structure in variables/species)}
+
 \item{txt}{Vector of row labels; generic labels are automatically generated if not provided}
 
 \item{link}{Type of cluster analysis the be performed:

@@ -34,7 +34,8 @@ f_disprof(
  \item Cao                 (\code{'cao'})
 }}
 
-\item{type}{'sample' will do type 1 DISPROF (testing structure in samples) and 'variable' will do type 3 DISPROF (testing structure in variables/species)}
+\item{type}{'sample' will do type 1 DISPROF (testing structure in samples)
+and 'variable' will do type 2 DISPROF (global test of structure in variables/species)}
 
 \item{iter}{Number of permutation for DISPROF analysis}
 
