@@ -1,8 +1,9 @@
-#' Dissimilarity profile analysis (DISPROF) of a cluster analysis dendrogram
+#' Dissimilarity profile analysis (DISPROF) of a cluster analysis dendrogram based on samples or variables/species
 #'
-#' This function follows Clarke et al.'s (2008) description of similarity
-#' profile analysis (SIMPROF), but employs an equivalent approach based on
-#' dissimilarity profile analysis (DISPROF).\cr
+#' This function clusters samples or variables/species. It then uses dissimilarity profile analysis (DISPROF)
+#' to identify statistically significant clusters in either samples (type 1)
+#' or variables/species (type 3). Before using this function, f_disprof should be used to check
+#' for if there is any significant multivariate structure in the data.\cr
 #' \cr
 #' This method is a form of agglomerative, hierarchical' cluster analysis.
 #'
@@ -10,6 +11,10 @@
 #'   null hypotheses in exploratory community analyses: similarity profiles and
 #'   biota-environmental linkage. J. Exp. Mar. Biol. Ecol. 366:56-69.
 #'   (\href{https://doi.org/10.1016/j.jembe.2008.07.009}{Clarke et al., 2008})
+#' @references Somerfield, P. J., and K. R. Clarke. 2013.  Inverse analysis in
+#' non-parametric multivariate analyses: distinguishing groups of associated
+#' species which covary coherently across samples. J. Exp. Mar. Biol. Ecol. 449:261-273.
+#'   (\href{http://dx.doi.org/10.1016/j.jembe.2013.10.002}{Somerfield and Clarke, 2013})
 #' @references Legendre, P. & L. Legendre. 2012. Numerical ecology. 3rd English
 #'   ed. Elsevier Science BV, Amsterdam.
 #'
@@ -31,6 +36,8 @@
 #'  \item Cao                 (\code{'cao'})
 #' }
 #'
+#' @param type 'sample' will do type 1 DISPROF (testing structure in samples)
+#' and 'variable' will do type 3 DISPROF (local test of structure in variables/species)
 #' @param txt  Vector of row labels; generic labels are automatically generated if not provided
 #' @param link Type of cluster analysis the be performed:
 #' \enumerate{
@@ -69,6 +76,7 @@
 
 f_disprof_clust <- function(Y,
                             dis    = 'euc',
+                            type = 'sample',
                             txt    = NULL,
                             link   = 1,
                             mc     = FALSE,
@@ -99,24 +107,50 @@ if        (link == 1) {
   warning("'link' must be a value from 1 to 6'")
 }
 
+if(!(type %in% c('sample', 'variable'))){
+  stop("Unsupported value suppled for argument `type`")
+} #Add check early on
+
 # ensure Y is in appropriate format for distance measures
 Y <- as.matrix(Y)
 
 
 # Set default grouping vector
 if (is.null(txt) == TRUE) {
-  txt <- as.character(1:(dim(Y)[1]))
+  if(type == 'sample'){
+    txt <- as.character(1:(dim(Y)[1]))
+  } else {
+    txt <- colnames(Y)
+    }
 }
 
 # Check whether labels are of compatible size
-if (length(txt) != dim(Y)[1]) {
-  warning("'txt' does not have the same number of rows as 'Y'")
-} else {
-  rownames(Y) <- txt
+
+if(type == 'sample'){
+  if (length(txt) != dim(Y)[1]) {
+    warning("'txt' does not have the same number of rows as 'Y'")
+    } else {
+      rownames(Y) <- txt
+    }
 }
 
-# Get number of rows of input data
-nR = dim(Y)[1]
+if(type == 'variable'){
+  if (length(txt) != dim(Y)[2]) {
+    warning("'txt' does not have the same number of columns as 'Y'")
+  } else {
+    colnames(Y) <- txt
+  }
+}
+
+
+# Get number of leaves/terminal nodes in dendrogram
+if(type== 'sample'){
+  nLeaves = dim(Y)[1]
+} else {
+  nLeaves = dim(Y)[2]
+}
+
+
 
 ################################################################################
 #                            CLUSTER ANALYSIS TREE:                            #
@@ -125,7 +159,12 @@ nR = dim(Y)[1]
 # Perform agglomerative heirarchical cluster analysis.
 # extracts the lower tridiagonal of the the resemblance matrix of Y, based on
 # user defined method 'dis', and method 'linkTxt'
-Y_dis     <- vegan::vegdist(Y, dis, na.rm = TRUE)
+
+if(type == 'sample'){
+  Y_dis <- vegan::vegdist(Y, dis, na.rm = TRUE) # distance between samples
+} else {
+  Y_dis <- vegan::vegdist(t(Y), dis, na.rm = TRUE) # distance between variables (often species)
+}
 
 Z         <- hclust(Y_dis,linkTxt)
 
@@ -136,7 +175,7 @@ cv[cv==0] <- pracma::eps(1)
 
 
 ### Determine the cluster membership at each split
-cluT <- matrix(NaN, nR, nR-1)
+cluT <- matrix(NaN, nLeaves, nLeaves-1)
 for (i in 1:length(cv)) {
   T         <- cutree(Z, h = cv[i])
   cluT[,i]  <- f_dummy2cat(as.matrix(vegan::vegdist(T, 'euc')) == 0)
@@ -146,11 +185,11 @@ for (i in 1:length(cv)) {
 oldC <- unique(as.vector(cluT)) # old cluster number
 nClu <- length(oldC)            # get no. of clusters
 newC <- 1:length(oldC)          # new cluster number
-clu  <- matrix(NaN, nR, nR-1)   # pre-allocate null matrix)
+clu  <- matrix(NaN, nLeaves, nLeaves-1)   # pre-allocate null matrix)
 for (i in 1:nClu) {
   clu[cluT==oldC[i]] <- newC[i]
 }
-if (identical(clu[,1], rep(1,nR)) == FALSE) {
+if (identical(clu[,1], rep(1,nLeaves)) == FALSE) {
   warning("Column 1 of CLU doesn't specify a SINGLE group!")
 }
 
@@ -178,11 +217,11 @@ rm(i, j, oldC, newC, cluT, cluN)
 #                Test of HOMOGENEITY OF COMPOSITION via DISPROF                #
 ################################################################################
 nC    <- dim(clu)[2]   # get no. of columns
-grp   <- rep(1, nR)    # Initialize as single group
-grpB  <- rep(1, nR)    # Initialize as single group
-inc   <- matrix(NaN, nR, nC-1)
-Pi    <- rep(NaN, nR)
-p     <- rep(NaN, nR)
+grp   <- rep(1, nLeaves)    # Initialize as single group
+grpB  <- rep(1, nLeaves)    # Initialize as single group
+inc   <- matrix(NaN, nLeaves, nC-1)
+Pi    <- rep(NaN, nLeaves)
+p     <- rep(NaN, nLeaves)
 p_idx <- list()
 cnt   <- 0             # Initialize p-value counter
 cntG  <- 1             # Initial group counter
@@ -222,7 +261,14 @@ for (i in 1:(nC-1)) {
         cat("\n", cntG+1, 'groups: ')
 
         # check rows for structure
-        disprof      <- f_disprof(Y[idxG,], dis, iter, FALSE, FALSE, FALSE)
+        if(type == 'sample'){
+          disprof      <- f_disprof(Y = Y[idxG,], dis = dis, type = "sample",
+                                          iter = iter, verb = FALSE, plt = FALSE, verb2 = FALSE)
+        } else {
+          disprof      <- f_disprof(Y = Y[,idxG], dis = dis, type = "3",
+                                          iter = iter, verb = FALSE, plt = FALSE, verb2 = FALSE)
+        }
+
         Pi[cnt]      <- disprof$Pi  # Collect Pi Statistics
         p[cnt]       <- disprof$p   # Collect p-values
         p_idx[[cnt]] <- idxG        # Collect list of rows tests

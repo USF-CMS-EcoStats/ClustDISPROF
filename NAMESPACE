@@ -3,6 +3,7 @@
 export(f_disprof)
 export(f_disprof_clust)
 export(f_disprof_clustPlot)
+export(f_relativize_counts)
 import(ggplot2)
 import(grDevices)
 import(stats)
